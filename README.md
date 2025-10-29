@@ -1,31 +1,28 @@
-# 🧠 OpenCV 입문 프로젝트
+# --- 1. OpenCV 설치 (Colab용) ---
+!pip install opencv-python-headless
 
-> **Made by [너의 이름] — 고1 개발자**
+# --- 2. 이미지 업로드 ---
+from google.colab import files
+uploaded = files.upload()  # 파일 선택
 
----
+import cv2, numpy as np
+from matplotlib import pyplot as plt
 
-## 📸 OpenCV란?
+# --- 3. 업로드한 이미지 읽기 ---
+filename = list(uploaded.keys())[0]
+img = cv2.imdecode(np.frombuffer(uploaded[filename], np.uint8), cv2.IMREAD_COLOR)
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-**OpenCV**(Open Computer Vision)는 **컴퓨터 비전(Computer Vision)**과 **이미지 처리(Image Processing)**를 위한 **오픈소스 라이브러리**입니다.  
-쉽게 말해 **컴퓨터가 눈을 가지게 해주는 도구**입니다 👀
+# --- 4. 얼굴 인식 ---
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
 
----
+# --- 5. 얼굴 위치 표시 ---
+for (x, y, w, h) in faces:
+    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
-## 🚀 OpenCV로 할 수 있는 일
-
-| 기능 | 설명 |
-|------|------|
-| 🎭 얼굴 인식 | 사진이나 영상 속 얼굴 탐지 |
-| 🚗 객체 탐지 | 사람, 자동차 등 특정 물체 인식 |
-| 🎨 이미지 필터 | 블러, 엣지 감지, 색상 변경 등 |
-| 🔄 이미지 변환 | 회전, 확대/축소, 색상 변환 |
-| 📹 실시간 카메라 제어 | 웹캠 영상 처리 및 분석 |
-
----
-
-## 🧩 설치 방법
-
-Python이 설치되어 있다면, 아래 한 줄이면 끝입니다 👇
-
-```bash
-pip install opencv-python
+# --- 6. 결과 출력 ---
+plt.figure(figsize=(6,6))
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
